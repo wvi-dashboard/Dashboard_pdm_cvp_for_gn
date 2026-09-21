@@ -2,7 +2,20 @@
 
 Dashboard statis untuk monitoring pasca-distribusi Cash & Voucher Programming (CVP) untuk Gift Notification (GN) Wahana Visi Indonesia.
 
-Dashboard menggunakan HTML, CSS, dan JavaScript tanpa framework atau backend. Semua sembilan halaman, filter, bahasa Indonesia/Inggris, tema gelap, ekspor CSV, serta cetak halaman/dossier tersedia di browser.
+Dashboard menggunakan HTML, CSS, dan JavaScript tanpa framework atau backend. Sembilan halaman analisis, satu halaman kredit, filter, bahasa Indonesia/Inggris, tema gelap, ekspor CSV, serta cetak halaman/dossier tersedia di browser.
+
+## Data live dari Google Sheets
+
+Dataset produksi dibaca langsung dari [PDM_CVP_for_GN_2026_Cleaning](https://docs.google.com/spreadsheets/d/1AGCIfhsQPycgDYrpctDpde8HUZqUriFT2Kp3eBF7pME/edit?usp=sharing) setiap dashboard dibuka atau direfresh. Endpoint CSV publik Google Sheets memakai `gid` tab `PDM CVP for GN 2026`; perubahan baris atau angka pada tab tersebut otomatis masuk ke kartu, grafik, tabel, dan filter tanpa mengedit HTML.
+
+Sheet harus tetap dapat dibaca melalui link. Jika koneksi Google gagal, dashboard memakai `data/pdm-2026.json` sebagai salinan cadangan dan menandai statusnya sebagai **Salinan cadangan**.
+
+Tahun fiskal dihitung dari tanggal submit:
+
+- FY2026: 1 Oktober 2025–30 September 2026;
+- FY2027: 1 Oktober 2026–30 September 2027.
+
+FY2027 sudah tersedia pada filter dan akan terisi otomatis ketika respons dengan tanggal Oktober 2026 atau sesudahnya masuk.
 
 ## Menjalankan secara lokal
 
@@ -32,6 +45,7 @@ index.html                      shell dan elemen UI tetap
 assets/css/dashboard.css        tampilan layar dan responsive layout
 assets/css/print.css            layout cetak halaman dan dossier
 assets/js/data.js               pemuatan dan validasi JSON
+assets/js/google-sheets.js      CSV live, pemetaan kolom, dan tahun fiskal
 assets/js/metrics.js            pemrosesan data dan perhitungan
 assets/js/state.js              dataset aktif, filter, dan state
 assets/js/charts.js             renderer chart HTML/CSS
@@ -51,9 +65,9 @@ tests/                          regression tests
 Alur runtime:
 
 ```text
-catalog.json → dataset JSON → validasi → state/filter
-                                      ↓
-                         metrics → cards/charts/tables
+Google Sheet → CSV live → pemetaan/validasi → state/filter
+                         ↓                     ↓
+              snapshot cadangan     metrics → cards/charts/tables
 ```
 
 ## Menambahkan dataset baru

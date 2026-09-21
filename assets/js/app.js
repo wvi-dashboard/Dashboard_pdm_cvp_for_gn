@@ -1,7 +1,7 @@
 import {currentLang,setLanguage,tr,translateUI} from './i18n.js';
 import {esc,pctS} from './format.js';
 import {PAGES} from './pages.js';
-import {DATA,AP_ALL,FSP_ALL,datasetMeta,installDataset,COVER_ID,current,setPage,SLICERS,state,openSlicer,setOpenSlicer,anyOn,pass,filtered,resetFilters,slicerLabel} from './state.js';
+import {DATA,AP_ALL,FSP_ALL,FY_ALL,datasetMeta,installDataset,COVER_ID,current,setPage,SLICERS,state,openSlicer,setOpenSlicer,anyOn,pass,filtered,resetFilters,slicerLabel} from './state.js';
 import {loadCatalog,loadDataset} from './data.js';
 import {buildCSV,exportFilename} from './export.js';
 const $=id=>document.getElementById(id);
@@ -33,7 +33,7 @@ function slicer(key,title,values){
         '<input type="checkbox" data-all="1"'+(allOn?' checked':'')+'>'+
         '<span>'+selectAllTxt+'</span><b>'+items.reduce((a,b)=>a+b.n,0)+'</b></label>';
   list+=items.map(i=>{
-    const on=sel.has(i.v), dis=(i.n===0 && !on);
+    const on=sel.has(i.v), dis=(i.n===0 && !on && key!=='fy');
     const dispVal = tr(i.v);
     return '<label class="sl-i'+(on?' sel':'')+(dis?' dis':'')+'" data-label="'+esc(dispVal).toLowerCase()+'">'+
       '<input type="checkbox" data-v="'+esc(i.v)+'"'+(on?' checked':'')+(dis?' disabled':'')+'>'+
@@ -54,10 +54,10 @@ function buildFilters(){
   $('slicers').innerHTML = SLICERS.map(([k,t,vals])=>slicer(k,t,vals())).join('');
   if(currentLang === 'en'){
     $('f-stat').innerHTML='<b>'+R.length+'</b> of '+DATA.length+' RCs \u00b7 '+aps.size+' PAs';
-    $('f-reset').textContent = 'Reset filters';
+    $('f-reset-txt').textContent = 'Clear filters';
   } else {
     $('f-stat').innerHTML='<b>'+R.length+'</b> dari '+DATA.length+' RC \u00b7 '+aps.size+' AP';
-    $('f-reset').textContent = 'Bersihkan filter';
+    $('f-reset-txt').textContent = 'Bersihkan filter';
   }
   $('f-reset').hidden = !anyOn();
 }
@@ -106,8 +106,9 @@ document.addEventListener('keydown',e=>{
 });
 
 function syncChrome(){
-  $('fbar').hidden = (current===COVER_ID);
-  if(current===COVER_ID) setOpenSlicer(null);
+  const isCover=current===COVER_ID||current==='p8';
+  $('fbar').hidden = isCover;
+  if(isCover) setOpenSlicer(null);
   updatePrintLetterhead();
 }
 
@@ -130,6 +131,7 @@ function render(){
   const R=filtered();
   const isEn = (currentLang === 'en');
   const selTxt = (state.ap.size ? (state.ap.has('__none__')?(isEn?'None selected':'Tidak ada pilihan'):[...state.ap].join(', ')) : (isEn ? 'all PAs' : 'semua AP'))
+    + (state.fy.size ? ' · FY '+[...state.fy].join('/') : '')
     + (state.fsp.size  ? ' \u00b7 FSP: '+[...state.fsp].join(', ') : '')
     + (state.lama.size ? ' \u00b7 '+(isEn?'old modality: ':'modalitas lama: ')+[...state.lama].map(v=>tr(v)).join('/') : '');
 
@@ -138,7 +140,7 @@ function render(){
     : '<div class="empty"><b>Tidak ada responden pada kombinasi filter ini.</b><br>Longgarkan salah satu filter di atas atau tekan "Bersihkan filter".</div>';
 
   $('pages').innerHTML = PAGES.map(([id,,h1,sub,fn])=>{
-    const isCover = (id===COVER_ID);
+    const isCover = (id===COVER_ID||id==='p8');
     const head = isCover ? '' :
       '<div class="top"><div><h1>'+tr(h1)+'</h1><div class="sub">'+tr(sub)+' \u00b7 '+esc(selTxt)+
       ' \u00b7 '+R.length+(isEn?' RCs':' RC')+'</div></div></div>';
@@ -235,12 +237,16 @@ document.addEventListener('keydown',e=>{
 $('filter-toggle').addEventListener('click',()=>{
   const closed=$('fbar').classList.toggle('filters-collapsed');
   $('filter-toggle').setAttribute('aria-expanded',String(!closed));
+  $('filter-toggle').textContent=currentLang==='en'?(closed?'Show filters':'Hide filters'):(closed?'Tampilkan filter':'Sembunyikan filter');
 });
 
 function updateLangUI(){
   document.documentElement.lang=currentLang;
   const isEn = (currentLang === 'en');
-  $('filter-toggle').textContent = isEn ? 'Filters' : 'Filter data';
+  const closed=$('fbar').classList.contains('filters-collapsed');
+  $('filter-toggle').textContent = isEn ? (closed?'Show filters':'Hide filters') : (closed?'Tampilkan filter':'Sembunyikan filter');
+  const resetTxt=$('f-reset-txt');
+  if(resetTxt) resetTxt.textContent=isEn?'Clear filters':'Bersihkan filter';
   const langToggle = $('lang-toggle');
   const mobLangToggle = $('mob-lang-toggle');
   if(langToggle) langToggle.classList.toggle('active-en', isEn);
@@ -279,6 +285,7 @@ function saveState(){
       lang: currentLang,
       page: current,
       ap: [...state.ap],
+      fy: [...state.fy],
       fsp: [...state.fsp],
       lama: [...state.lama]
     };
@@ -299,6 +306,7 @@ function loadState(){
       setLanguage(s.lang);
     }
     if((!s.datasetId || s.datasetId===datasetMeta.id) && Array.isArray(s.ap)) s.ap.filter(v=>v==='__none__'||AP_ALL.includes(v)).forEach(v=>state.ap.add(v));
+    if((!s.datasetId || s.datasetId===datasetMeta.id) && Array.isArray(s.fy)) s.fy.filter(v=>v==='__none__'||FY_ALL.includes(v)).forEach(v=>state.fy.add(v));
     if((!s.datasetId || s.datasetId===datasetMeta.id) && Array.isArray(s.fsp)) s.fsp.filter(v=>v==='__none__'||FSP_ALL.includes(v)).forEach(v=>state.fsp.add(v));
     if((!s.datasetId || s.datasetId===datasetMeta.id) && Array.isArray(s.lama)) s.lama.filter(v=>['Ya','Tidak','__none__'].includes(v)).forEach(v=>state.lama.add(v));
     if(s.page && PAGES.some(p=>p[0]===s.page)){
@@ -348,7 +356,7 @@ if(btnExport) btnExport.addEventListener('click', exportCSV);
 function updatePrintLetterhead(isAllPages = false){
   const pl = $('print-letterhead');
   if(!pl) return;
-  if(!isAllPages && current === COVER_ID){
+  if(!isAllPages && (current === COVER_ID||current==='p8')){
     pl.innerHTML = '';
     pl.style.display = 'none';
     return;
@@ -392,6 +400,7 @@ function updatePrintLetterhead(isAllPages = false){
   const R = filtered();
   const aps = new Set(R.map(r => r.ap));
   const filterSummary = esc(datasetMeta.label[currentLang])+' · '+(state.ap.size ? [...state.ap].map(v=>v==='__none__'?(isEn?'None selected':'Tidak ada pilihan'):v).map(esc).join(', ') : (isEn ? 'All Program Areas' : 'Semua Area Program'))
+    + (state.fy.size ? ' · FY ' + [...state.fy].map(esc).join('/') : '')
     + (state.fsp.size ? ' · FSP: ' + [...state.fsp].map(esc).join(', ') : '')
     + (state.lama.size ? ' · ' + (isEn ? 'Old Modality: ' : 'Modalitas Lama: ') + [...state.lama].map(v=>tr(v)).join('/') : '');
 
@@ -551,7 +560,10 @@ function updateDatasetUI(){
     option.textContent=entry.label[currentLang];return option;
   }));
   select.value=datasetMeta.id || catalog.defaultDataset;
-  if(datasetMeta.id) $('dataset-status').textContent=(currentLang==='en'?'Updated ':'Diperbarui ')+datasetMeta.updatedAt+' · '+DATA.length+(currentLang==='en'?' respondents':' responden');
+  if(datasetMeta.id){
+    const live=datasetMeta.live===true?(currentLang==='en'?'Live · ':'Live · '):datasetMeta.live===false?(currentLang==='en'?'Cached copy · ':'Salinan cadangan · '):'';
+    $('dataset-status').textContent=live+(currentLang==='en'?'Updated ':'Diperbarui ')+datasetMeta.updatedAt+' · '+DATA.length+(currentLang==='en'?' respondents':' responden');
+  }
 }
 async function selectDataset(id,initial=false){
   const entry=catalog.datasets.find(item=>item.id===id);

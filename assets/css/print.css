@@ -152,3 +152,4 @@
  .top h1:focus{outline:none}
 }
 @media print{.dataset-bar{display:none!important}[aria-busy="true"]{opacity:1}}
+@media print{.closing-cover{min-height:90vh!important;box-shadow:none!important;border:2px solid #FF5000!important;background:#fff!important}.closing-mark img{width:230px!important}.copyright{color:#475569!important}}
