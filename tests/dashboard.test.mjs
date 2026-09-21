@@ -11,6 +11,7 @@ import {verbatim} from '../assets/js/components.js';
 import {setLanguage} from '../assets/js/i18n.js';
 import {dec,rp,esc} from '../assets/js/format.js';
 import {buildCSV,exportFilename} from '../assets/js/export.js';
+import {parseCSV,rowsToDataset} from '../assets/js/google-sheets.js';
 const read=file=>JSON.parse(fs.readFileSync(new URL('../'+file,import.meta.url)));
 const dataset=read('data/pdm-2026.json'),schema=read('data/schema.json'),example=read('examples/example-2027.json');
 
@@ -40,8 +41,8 @@ test('Baseline KPIs and quality exclusions are preserved',()=>{
   assert.equal(m.mean,'4,6');
   assert.equal(metrics.calculate_page_demografi(dataset.records).keDq,12);
 });
-test('All nine page renderers support both languages and every AP/FSP subset',()=>{
-  assert.deepEqual(PAGES.map(p=>p[0]),['p0','p1','pd','p2','p3','p4','p5','p6','p7']);
+test('All ten page renderers support both languages and every AP/FSP subset',()=>{
+  assert.deepEqual(PAGES.map(p=>p[0]),['p0','p1','pd','p2','p3','p4','p5','p6','p7','p8']);
   const subsets=[dataset.records,...['ap','fsp','lama'].flatMap(k=>[...new Set(dataset.records.map(r=>r[k]))].map(v=>dataset.records.filter(r=>r[k]===v))),example.records];
   for(const lang of ['id','en']){
     setLanguage(lang);
@@ -58,6 +59,17 @@ test('Cross filtering, clear-none, select-all and reset are distinct',()=>{
   state.state.lama.add('Ya');assert.ok(state.filtered().every(r=>r.ap==='Simokerto'&&r.lama==='Ya'));
   state.state.ap.clear();state.state.ap.add('__none__');assert.equal(state.filtered().length,0);
   state.resetFilters();assert.equal(state.filtered().length,46);
+});
+test('Fiscal-year filtering follows the October to September WVI cycle',()=>{
+  state.installDataset({...dataset,records:[{...dataset.records[0],fy:'2026'},{...dataset.records[1],fy:'2027'}]});state.resetFilters();
+  assert.deepEqual(state.FY_ALL,['2026','2027']);state.state.fy.add('2027');assert.equal(state.filtered().length,1);state.resetFilters();
+  state.installDataset(dataset);
+});
+test('Google Sheet CSV parser handles quoted cells and fiscal years',()=>{
+  assert.deepEqual(parseCSV('a,b\r\n"x, y","a""b"\r\n'),[['a','b'],['x, y','a"b']]);
+  const headers=['Nama AP','A. DEMOGRAFI RESPONDEN/Apakah Anda/anak Anda pernah menerima GN dari WVI SEBELUM tahun 2025 (dengan metode lama — bantuan barang/gift langsung)?','D. PROSES DISTRIBUSI/Berapa jumlah dana GN yang Anda terima? (IDR)','Tanggal Submit','A. DEMOGRAFI RESPONDEN/Apakah Anda menerima GN dari WVI?','C. PENYEDIA JASA KEUANGAN (FSP)/Penyedia jasa keuangan (FSP) mana yang Anda gunakan untuk mencairkan GN?'];
+  const live=rowsToDataset([headers,['Example-12345','Tidak','1,200,000','2026-10-01','Ya','Kantor Pos']],{id:'live',cycle:'2026–2027',label:{id:'Live',en:'Live'},credits:[]});
+  assert.equal(live.records[0].fy,'2027');assert.equal(live.records[0].ap,'Example');assert.equal(live.records[0].dana,1200000);
 });
 test('New dataset discovers new AP/FSP options and new monetary scale',()=>{
   state.installDataset(example);state.resetFilters();

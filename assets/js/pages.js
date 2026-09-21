@@ -128,6 +128,13 @@ function cover(R){
    +progText
    +'</div></div>';
 }
+function credits(){
+  return '<div class="closing-cover">'+
+    '<div class="closing-orbit orbit-one"></div><div class="closing-orbit orbit-two"></div>'+
+    '<div class="closing-mark"><img src="wvi-logo-navy.png" alt="Wahana Visi Indonesia"></div>'+
+    '<div class="copyright">© '+new Date().getFullYear()+' PEARL Lead · Wahana Visi Indonesia</div>'+
+  '</div>';
+}
 /* ================= PAGES 1 - 4 ================= */
 function pg1(R){
   const {n,aps,dOk,bad,kv5,mean,info6all,kepFspPos,danaSes,kemampuanPos,kepPos,mekAda}=calculate_pg1(R);
@@ -564,7 +571,8 @@ const ICO={
   truck:'<svg viewBox="0 0 24 24"><rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>',
   wallet:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10.5h18"/><path d="M16.5 14.8h.01"/></svg>',
   smile:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.2a4.4 4.4 0 0 0 7 0"/><path d="M9 9.5h.01"/><path d="M15 9.5h.01"/></svg>',
-  shield:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.6"/></svg>'
+  shield:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.6"/></svg>',
+  team:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-2a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v2"/><path d="M15 14h1a4 4 0 0 1 4 4v2"/></svg>'
 };
 
 export const PAGES=[
@@ -576,6 +584,6 @@ export const PAGES=[
  ['p4','Distribusi','Area 3 \u2014 Proses Distribusi','Tabel 5, 6 &amp; 7',pg4,ICO.truck],
  ['p5','Penggunaan','Area 4 \u2014 Penggunaan Dana','Tabel 8',pg5,ICO.wallet],
  ['p6','Kepuasan','Area 5 \u2014 Kepuasan &amp; Perbandingan Modalitas','Tabel 9',pg6,ICO.smile],
- ['p7','Akuntabilitas','Area 6 \u2014 Akuntabilitas','Tabel 11',pg7,ICO.shield]
+ ['p7','Akuntabilitas','Area 6 \u2014 Akuntabilitas','Tabel 11',pg7,ICO.shield],
+ ['p8','Cover Belakang',null,null,credits,ICO.team]
 ];
-

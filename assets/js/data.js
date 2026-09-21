@@ -1,3 +1,4 @@
+import {loadGoogleSheet} from './google-sheets.js';
 // This module has no DOM dependency; the same validation runs in the browser and CLI.
 export function validateDataset(value, schema) {
   const errors=[];
@@ -40,7 +41,8 @@ export async function loadCatalog(signal){
   if(catalog.schemaVersion!==1||!Array.isArray(catalog.datasets)||!catalog.datasets.length) throw new Error('Invalid dataset catalog.');
   const ids=new Set();
   for(const entry of catalog.datasets){
-    if(!entry.id||ids.has(entry.id)||!entry.label?.id||!entry.label?.en||!safeDatasetPath(entry.path)) throw new Error('Invalid or duplicate catalog entry.');
+    const hasLocal=safeDatasetPath(entry.path),hasSheet=entry.googleSheet?.spreadsheetId&&Number.isInteger(entry.googleSheet.gid);
+    if(!entry.id||ids.has(entry.id)||!entry.label?.id||!entry.label?.en||(!hasLocal&&!hasSheet)) throw new Error('Invalid or duplicate catalog entry.');
     ids.add(entry.id);
   }
   if(!ids.has(catalog.defaultDataset)) throw new Error('Default dataset is missing from catalog.');
@@ -49,7 +51,16 @@ export async function loadCatalog(signal){
 export function safeDatasetPath(path){return typeof path==='string'&&/^[a-zA-Z0-9_-]+\.json$/.test(path);}
 export async function loadDataset(entry,signal){
   if(!safeDatasetPath(entry.path)) throw new Error('Dataset paths must be JSON files in data/.');
-  const [value,schema]=await Promise.all([readJSON(new URL(entry.path,dataRoot),signal),readJSON(new URL('schema.json',dataRoot),signal)]);
+  const schema=await readJSON(new URL('schema.json',dataRoot),signal);
+  let value;
+  if(entry.googleSheet){
+    try{ value=await loadGoogleSheet(entry,signal); }
+    catch(error){
+      if(error.name==='AbortError') throw error;
+      value=await readJSON(new URL(entry.path,dataRoot),signal);
+      value={...value,id:entry.id,label:entry.label,cycle:entry.cycle||value.cycle,source:entry.sourceUrl||value.source,credits:entry.credits||[],live:false,liveError:error.message};
+    }
+  }else value=await readJSON(new URL(entry.path,dataRoot),signal);
   validateDataset(value,schema);
   if(value.id!==entry.id) throw new Error('Dataset ID does not match its catalog entry.');
   return value;

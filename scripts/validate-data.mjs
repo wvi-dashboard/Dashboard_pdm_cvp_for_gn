@@ -12,7 +12,7 @@ for(const entry of catalog.datasets){
   if(ids.has(entry.id)||!safeDatasetPath(entry.path)||!entry.label?.id||!entry.label?.en) throw new Error('Invalid catalog entry');
   ids.add(entry.id);
   const dataset=validateDataset(await read('data/'+entry.path),schema);
-  if(dataset.id!==entry.id) throw new Error('Dataset and catalog IDs differ');
+  if(dataset.id!==entry.id&&!entry.googleSheet) throw new Error('Dataset and catalog IDs differ');
   console.log(`${entry.id}: ${dataset.records.length} valid records`);
 }
 if(!ids.has(catalog.defaultDataset)) throw new Error('Default dataset missing');

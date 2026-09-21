@@ -1,13 +1,19 @@
 {
   "schemaVersion": 1,
-  "defaultDataset": "pdm-2026",
+  "defaultDataset": "pdm-live",
   "datasets": [
     {
-      "id": "pdm-2026",
+      "id": "pdm-live",
       "path": "pdm-2026.json",
+      "cycle": "2026–2027",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1AGCIfhsQPycgDYrpctDpde8HUZqUriFT2Kp3eBF7pME/edit?usp=sharing",
+      "googleSheet": {
+        "spreadsheetId": "1AGCIfhsQPycgDYrpctDpde8HUZqUriFT2Kp3eBF7pME",
+        "gid": 834457338
+      },
       "label": {
-        "id": "PDM GN · Siklus 2026",
-        "en": "GN PDM · 2026 cycle"
+        "id": "PDM GN · Google Sheet Live",
+        "en": "GN PDM · Live Google Sheet"
       }
     }
   ]

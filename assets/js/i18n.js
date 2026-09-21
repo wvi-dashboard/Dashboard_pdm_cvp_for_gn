@@ -7,6 +7,8 @@ const EN_DICT = {
   "Menu Navigasi": "Navigation Menu",
   "Dashboard PDM CVP for GN": "PDM CVP for GN Dashboard",
   "Cover": "Cover",
+  "Tahun Fiskal": "Fiscal Year",
+  "Cover Belakang": "Back Cover",
   "Overview": "Overview",
   "Ringkasan 6 area asesmen": "Summary of 6 assessment areas",
   "Demografi": "Demographics",
