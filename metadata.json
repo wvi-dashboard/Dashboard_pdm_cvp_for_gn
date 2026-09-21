@@ -1,6 +1,6 @@
 {
   "name": "Dashboard PDM CVP for GN",
-  "description": "Dashboard monitoring post-distribution Cash & Voucher Programming (CVP) untuk Gift Notification (GN) Wahana Visi Indonesia",
+  "description": "Dashboard statis monitoring post-distribution Cash & Voucher Programming (CVP) untuk Gift Notification (GN) Wahana Visi Indonesia",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
