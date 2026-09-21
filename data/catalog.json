@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "defaultDataset": "pdm-2026",
+  "datasets": [
+    {
+      "id": "pdm-2026",
+      "path": "pdm-2026.json",
+      "label": {
+        "id": "PDM GN · Siklus 2026",
+        "en": "GN PDM · 2026 cycle"
+      }
+    }
+  ]
+}

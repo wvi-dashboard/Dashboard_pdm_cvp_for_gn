@@ -1,0 +1,154 @@
+/* Report layouts are isolated from screen styles. */
+@media print{
+  @page{
+    margin:10mm 12mm;
+    size:A4 portrait;
+  }
+  body{
+    background:#ffffff!important;
+    color:#111222!important;
+    font-size:11.5px!important;
+  }
+  .mobile-bar, aside, .fbar, .sidebar-backdrop, .toggle-btn, .theme-btn, .lang-btn{display:none!important}
+  .frame{
+    box-shadow:none!important;margin:0!important;max-width:100%!important;border-radius:0!important;
+    display:block!important;border:none!important;background:#ffffff!important;
+  }
+  main{padding:0!important;margin:0!important}
+  
+  /* Single page print default */
+  .pg{display:none!important}
+  .pg.on{display:block!important}
+
+  /* Full multi-page dossier print */
+  body.print-all-pages .pg{
+    display:block!important;
+    page-break-before:always!important;
+    break-before:page!important;
+    margin-bottom:0!important;
+    padding-top:10px!important;
+  }
+  body.print-all-pages .pg#p0,
+  body.print-all-pages .pg:first-of-type{
+    page-break-before:avoid!important;
+    break-before:avoid!important;
+    padding-top:0!important;
+  }
+
+  /* Section top header in print */
+  .top{
+    display:flex!important;
+    flex-direction:column!important;
+    border-bottom:2px solid #FF5000!important;
+    padding-bottom:5px!important;
+    margin-bottom:12px!important;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  .top h1{
+    font-size:16px!important;
+    font-weight:800!important;
+    color:#0f172a!important;
+    margin:0 0 2px!important;
+  }
+  .top .sub{
+    font-size:9.5px!important;
+    color:#475569!important;
+  }
+
+  .c{
+    box-shadow:none!important;border:1px solid #cbd5e1!important;
+    break-inside:avoid;page-break-inside:avoid;margin-bottom:12px!important;
+    background:#ffffff!important;
+  }
+
+  /* Cover print */
+  .cover{
+    min-height:92vh!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    box-shadow:none!important;
+    border:2px solid #FF5000!important;
+    background:#ffffff!important;
+    color:#111222!important;
+    padding:40px 30px!important;
+  }
+  .cover .prog{
+    color:#334155!important;
+  }
+
+  /* Table and rows page break behavior */
+  table{width:100%!important;border-collapse:collapse!important}
+  thead{display:table-header-group!important}
+  tr{break-inside:avoid;page-break-inside:avoid}
+  
+  /* Kop Laporan Resmi Wahana Visi Indonesia */
+  .print-letterhead{
+    display:block!important;
+    margin-bottom:18px!important;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .pl-kop{
+    display:flex!important;align-items:center!important;gap:18px!important;margin-bottom:10px!important;
+  }
+  .pl-logo-col{flex:0 0 150px!important}
+  .pl-logo{width:150px!important;height:auto!important;display:block!important}
+  /* cetak selalu di kertas putih: paksa varian navy walau dashboard sedang dark mode */
+  .cv-logo-img.mono{display:none!important}
+  .cv-logo-img.dark{display:block!important}
+  .cv-logo-wrapper{top:30px!important;right:30px!important;width:170px!important}
+  .pl-title-col{flex:1 1 auto!important}
+  .pl-org{
+    font-size:14px!important;font-weight:800!important;letter-spacing:0.6px!important;
+    color:#111222!important;line-height:1.2!important;
+  }
+  .pl-org-sub{
+    font-size:9px!important;color:#64748b!important;margin-bottom:3px!important;
+  }
+  .pl-doc-title{
+    font-size:12.5px!important;font-weight:800!important;color:#FF5000!important;
+    letter-spacing:0.3px!important;line-height:1.2!important;
+  }
+  .pl-doc-sub{
+    font-size:9.5px!important;font-weight:600!important;color:#334155!important;
+  }
+  .pl-divider{
+    height:3px!important;background:#FF5000!important;border-bottom:1px solid #111222!important;
+    margin:8px 0 12px!important;
+  }
+  .pl-meta-grid{
+    display:grid!important;grid-template-columns:1.2fr 0.8fr!important;gap:6px 14px!important;
+    background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:6px!important;
+    padding:8px 12px!important;font-size:9.5px!important;color:#111222!important;
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;
+  }
+  .pl-meta-item{display:flex!important;flex-direction:column!important;gap:2px!important}
+  .pl-lbl{
+    font-size:8px!important;font-weight:700!important;letter-spacing:0.8px!important;
+    color:#64748b!important;text-transform:uppercase!important;
+  }
+  .pl-val{font-size:9.5px!important;color:#0f172a!important;line-height:1.3!important}
+  .pl-val b{color:#FF5000!important}
+  
+  /* Preserve exact colors for bars, charts and tags */
+  .b i, .bar, .pill, .ring, .tbl-tag{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+}
+@media print{
+ .table-scroll{overflow:visible;max-width:none}
+ .table-scroll table{min-width:0!important}
+ .vb{max-height:none!important;overflow:visible!important}
+ body.dark{--d:#111222;--d-2:#4A4A55;--d-3:#626273;--d-4:#BFBFC7;--card:#fff;--page:#fff;--grid:#F2F2F5;--line:#ddd}
+ .funnel-track,.bar-value,.funnel-label{print-color-adjust:exact}
+}
+@media print{
+ .skip-link,.filter-toggle{display:none!important}
+ .c{padding:12px!important}.c h3{font-size:12px!important}
+ .c .st,th,td,.hb .k,.bar-value,.funnel-label{font-size:10px!important}
+ .pm .tab{background:transparent!important}.pm{background:#fff!important;box-shadow:none!important}
+ .fnl,.hb{gap:7px 10px}
+ .top h1:focus{outline:none}
+}
+@media print{.dataset-bar{display:none!important}[aria-busy="true"]{opacity:1}}
